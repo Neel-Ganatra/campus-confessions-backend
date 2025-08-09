@@ -855,6 +855,12 @@ import {
   broadcastReactionUpdate,
 } from "../socket/socketHandler.js";
 import { checkAndPostToInstagram } from "../services/instagramService.js";
+import cors from "cors";
+
+const app = express();
+
+app.use(cors());
+app.use(express.json());
 
 const router = express.Router();
 const prisma = new PrismaClient();

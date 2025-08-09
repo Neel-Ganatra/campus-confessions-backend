@@ -145,6 +145,7 @@ import fs from "fs";
 import dotenv from "dotenv";
 import { createCanvas, registerFont } from "canvas";
 import { v2 as cloudinary } from "cloudinary";
+import cors from "cors";
 
 // Load env variables
 dotenv.config();
@@ -160,13 +161,18 @@ import { handleSocketConnection } from "./socket/socketHandler.js";
 import { checkAndPostToInstagram } from "./services/instagramService.js";
 
 const app = express();
+app.use(cors());
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
     origin:
       process.env.NODE_ENV === "production"
         ? ["https://your-frontend-domain.com"]
-        : ["http://localhost:3000", "http://localhost:5173"],
+        : [
+            "http://localhost:3000",
+            "http://localhost:5173",
+            "https://campus-confessions.vercel.app",
+          ],
     methods: ["GET", "POST"],
   },
 });
