@@ -165,7 +165,7 @@ const io = new Server(server, {
   cors: {
     origin:
       process.env.NODE_ENV === "production"
-        ? ["https://your-frontend-domain.com"]
+        ? ["https://campus-confessions.vercel.app"] // change here
         : [
             "http://localhost:3000",
             "http://localhost:5173",
