@@ -145,7 +145,6 @@ import fs from "fs";
 import dotenv from "dotenv";
 import { createCanvas, registerFont } from "canvas";
 import { v2 as cloudinary } from "cloudinary";
-import cors from "cors";
 
 // Load env variables
 dotenv.config();
