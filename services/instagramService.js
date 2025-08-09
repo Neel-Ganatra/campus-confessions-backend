@@ -107,6 +107,16 @@ import axios from "axios";
  * Generates an image from the confession content.
  */
 export const generateImageFromConfession = async (confession) => {
+  console.log("🚀 About to generate image for confession:", confession.id);
+  console.log("📝 Confession content:", confession.content);
+  console.log("📝 Confession type:", typeof confession.content);
+
+  const payload = {
+    content: confession.content,
+    college: confession.college,
+  };
+
+  console.log("📤 Sending payload:", payload);
   const response = await axios.post(
     "https://campus-confessions-backend.onrender.com/api/generate-image",
     {

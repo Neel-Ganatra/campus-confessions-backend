@@ -264,6 +264,15 @@ function roundRect(ctx, x, y, width, height, radius) {
 app.post("/api/generate-image", async (req, res) => {
   try {
     const { content, college } = req.body;
+    console.log("📥 Received request body:", req.body);
+    console.log("📝 Content:", content);
+
+    if (!content || typeof content !== "string") {
+      return res.status(400).json({
+        error: "Content is required and must be a string",
+      });
+    }
+
     const width = 1080;
     const height = 1080;
     const canvas = createCanvas(width, height);
@@ -343,6 +352,10 @@ app.post("/api/generate-image", async (req, res) => {
 
 // Text wrapping function
 function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+  if (!text || typeof text !== "string") {
+    console.error("❌ wrapText received invalid text:", text);
+    return; // Exit early if text is invalid
+  }
   const words = text.split(" ");
   let line = "";
   for (let i = 0; i < words.length; i++) {
