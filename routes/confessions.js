@@ -1017,6 +1017,14 @@ router.post("/:id/react", async (req, res) => {
     const updatedConfession = await prisma.confession.update({
       where: { id: confessionId },
       data: { [reactionType]: { increment: 1 } },
+      select: {
+        id: true,
+        fire: true,
+        heart: true,
+        skull: true,
+        cry: true,
+        postedToWebhook: true,
+      },
     });
 
     const totalReactions =
@@ -1029,9 +1037,19 @@ router.post("/:id/react", async (req, res) => {
       `Total reactions: ${totalReactions}, calling checkAndPostToInstagram...`
     );
 
-    if (totalReactions >= 50) {
-      console.log(`Total reactions >= 50, calling checkAndPostToInstagram...`);
-      await checkAndPostToInstagram(updatedConfession);
+    // if (totalReactions >= 50) {
+    //   console.log(`Total reactions >= 50, calling checkAndPostToInstagram...`);
+    //   await checkAndPostToInstagram(updatedConfession);
+    // }
+    if (totalReactions >= 50 && !updatedConfession.postedToWebhook) {
+      const postResult = await checkAndPostToInstagram(updatedConfession);
+
+      if (postResult.success) {
+        await prisma.confession.update({
+          where: { id: confessionId },
+          data: { postedToWebhook: true },
+        });
+      }
     }
 
     if (io) {

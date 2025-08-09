@@ -61,10 +61,11 @@ model Confession {
   isFlagged Boolean  @default(false) // For moderation purposes
 
   // Reaction counts
-  fire  Int @default(0) // 🔥 reactions
-  heart Int @default(0) // ❤️ reactions  
-  skull Int @default(0) // 💀 reactions
-  cry   Int @default(0) // 😭 reactions
+  fire            Int     @default(0) // 🔥 reactions
+  heart           Int     @default(0) // ❤️ reactions  
+  skull           Int     @default(0) // 💀 reactions
+  cry             Int     @default(0) // 😭 reactions
+  postedToWebhook Boolean @default(false) // new field
 
   // Relationship to reports
   reports  Report[]

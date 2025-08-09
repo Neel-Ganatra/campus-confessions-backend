@@ -160,10 +160,12 @@ export const postToInstagramWebhook = async (confession) => {
   try {
     const webhookUrl = process.env.INSTAGRAM_WEBHOOK_URL;
     console.log(`Posting to webhook URL: ${webhookUrl}`);
-    if (!webhookUrl) throw new Error("Webhook URL not set in .env");
-    console.log(`Generated image URL: ${imageUrl}`);
 
+    if (!webhookUrl) throw new Error("Webhook URL not set in .env");
+
+    // Declare and assign imageUrl BEFORE using it
     const imageUrl = await generateImageFromConfession(confession);
+    console.log(`Generated image URL: ${imageUrl}`);
 
     const payload = {
       id: confession.id,
