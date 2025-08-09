@@ -1137,7 +1137,7 @@ router.post("/:id/comments", async (req, res) => {
           id: comment.id,
           content: comment.content,
           createdAt: comment.createdAt,
-          parentId: comment.parentId, // ✅ send parentId in socket event
+          parentId: comment.parentId,
         },
       });
     }
