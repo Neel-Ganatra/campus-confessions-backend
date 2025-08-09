@@ -161,7 +161,6 @@ import { handleSocketConnection } from "./socket/socketHandler.js";
 import { checkAndPostToInstagram } from "./services/instagramService.js";
 
 const app = express();
-app.use(cors());
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
