@@ -1,3 +1,45 @@
+// generator client {
+//   provider = "prisma-client-js"
+// }
+
+// datasource db {
+//   provider = "mysql"
+//   url      = env("DATABASE_URL")
+// }
+
+// // Confession model - stores anonymous confessions
+// model Confession {
+//   id        Int      @id @default(autoincrement())
+//   content   String   @db.Text // The confession text content
+//   createdAt DateTime @default(now())
+//   college   String?  // Optional college filter
+//   isFlagged Boolean  @default(false) // For moderation purposes
+
+//   // Reaction counts
+//   fire  Int @default(0) // 🔥 reactions
+//   heart Int @default(0) // ❤️ reactions  
+//   skull Int @default(0) // 💀 reactions
+//   cry   Int @default(0) // 😭 reactions
+
+//   // Relationship to reports
+//   reports Report[]
+
+//   @@map("confessions")
+// }
+
+// // Report model - stores reports for moderation
+// model Report {
+//   id           Int      @id @default(autoincrement())
+//   confessionId Int      // Foreign key to confession
+//   reason       String   @db.Text // Reason for reporting
+//   reportedAt   DateTime @default(now())
+
+//   // Relationship to confession
+//   confession Confession @relation(fields: [confessionId], references: [id], onDelete: Cascade)
+
+//   @@map("reports")
+// } 
+
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
@@ -15,30 +57,46 @@ model Confession {
   id        Int      @id @default(autoincrement())
   content   String   @db.Text // The confession text content
   createdAt DateTime @default(now())
-  college   String?  // Optional college filter
+  college   String? // Optional college filter
   isFlagged Boolean  @default(false) // For moderation purposes
-  
+
   // Reaction counts
   fire  Int @default(0) // 🔥 reactions
   heart Int @default(0) // ❤️ reactions  
   skull Int @default(0) // 💀 reactions
   cry   Int @default(0) // 😭 reactions
-  
+
   // Relationship to reports
-  reports Report[]
-  
+  reports  Report[]
+  // Relationship to comments
+  comments Comment[]
+
   @@map("confessions")
 }
 
 // Report model - stores reports for moderation
 model Report {
   id           Int      @id @default(autoincrement())
-  confessionId Int      // Foreign key to confession
+  confessionId Int // Foreign key to confession
   reason       String   @db.Text // Reason for reporting
   reportedAt   DateTime @default(now())
-  
+
   // Relationship to confession
   confession Confession @relation(fields: [confessionId], references: [id], onDelete: Cascade)
-  
+
   @@map("reports")
-} 
+}
+
+// Comment model - stores comments for confessions
+model Comment {
+  id           Int        @id @default(autoincrement())
+  confessionId Int
+  content      String     @db.Text
+  createdAt    DateTime   @default(now())
+  parentId     Int?
+  parent       Comment?   @relation("CommentReplies", fields: [parentId], references: [id])
+  replies      Comment[]  @relation("CommentReplies")
+  confession   Confession @relation(fields: [confessionId], references: [id], onDelete: Cascade)
+
+  @@map("comments")
+}

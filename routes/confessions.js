@@ -921,15 +921,22 @@ router.post("/", async (req, res) => {
 // Fetch confessions
 router.get("/", async (req, res) => {
   try {
-    const { college, page = 1, limit = 20 } = req.query;
+    const { college, page = 1 } = req.query;
     const pageNum = parseInt(page);
-    const limitNum = parseInt(limit);
+    const limitNum = 20; // Enforce 20 posts per page as requested
 
-    if (isNaN(pageNum) || isNaN(limitNum))
+    if (isNaN(pageNum))
       return res.status(400).json({ error: "Invalid pagination" });
 
     const whereClause = { isFlagged: false };
-    if (college && college !== "All") whereClause.college = college;
+    if (college && college !== "All") {
+      // Treat Anonymous as null in DB
+      if (college === "Anonymous") {
+        whereClause.college = null;
+      } else {
+        whereClause.college = college;
+      }
+    }
 
     const [confessions, totalCount] = await Promise.all([
       prisma.confession.findMany({
@@ -946,6 +953,7 @@ router.get("/", async (req, res) => {
           heart: true,
           skull: true,
           cry: true,
+          _count: { select: { comments: true } },
         },
       }),
       prisma.confession.count({ where: whereClause }),
@@ -962,6 +970,7 @@ router.get("/", async (req, res) => {
         skull: c.skull,
         cry: c.cry,
       },
+      commentsCount: c._count?.comments || 0,
     }));
 
     res.json({
@@ -1046,3 +1055,96 @@ router.post("/:id/react", async (req, res) => {
 });
 
 export default router;
+// Comments endpoints
+router.get("/:id/comments", async (req, res) => {
+  try {
+    const confessionId = parseInt(req.params.id);
+    const page = parseInt(req.query.page || "1");
+    const limit = Math.min(parseInt(req.query.limit || "20"), 50);
+    if (isNaN(confessionId) || isNaN(page) || isNaN(limit)) {
+      return res.status(400).json({ error: "Invalid parameters" });
+    }
+
+    const skip = (page - 1) * limit;
+    const [comments, total] = await Promise.all([
+      prisma.comment.findMany({
+        where: { confessionId },
+        orderBy: { createdAt: "asc" },
+        skip,
+        take: limit,
+        select: {
+          id: true,
+          content: true,
+          createdAt: true,
+          parentId: true, // ✅ add this
+        },
+      }),
+      prisma.comment.count({ where: { confessionId } }),
+    ]);
+
+    res.json({
+      comments,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(total / limit),
+        totalCount: total,
+        hasNextPage: page * limit < total,
+        hasPrevPage: page > 1,
+      },
+    });
+  } catch (err) {
+    console.error("Error fetching comments:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.post("/:id/comments", async (req, res) => {
+  try {
+    const confessionId = parseInt(req.params.id);
+    const { content, parentId } = req.body || {}; // ✅ added parentId here
+
+    if (isNaN(confessionId) || !content || !content.trim()) {
+      return res.status(400).json({ error: "Invalid input" });
+    }
+
+    const confession = await prisma.confession.findUnique({
+      where: { id: confessionId },
+      select: { id: true },
+    });
+    if (!confession) {
+      return res.status(404).json({ error: "Confession not found" });
+    }
+
+    const comment = await prisma.comment.create({
+      data: {
+        confessionId,
+        content: content.trim(),
+        parentId: parentId || null, // ✅ now works
+      },
+      select: {
+        id: true,
+        content: true,
+        createdAt: true,
+        confessionId: true,
+        parentId: true, // ✅ include parentId in response
+      },
+    });
+
+    if (io) {
+      io.emit("comment_created", {
+        confessionId,
+        comment: {
+          id: comment.id,
+          content: comment.content,
+          createdAt: comment.createdAt,
+          parentId: comment.parentId, // ✅ send parentId in socket event
+        },
+      });
+    }
+
+    res.status(201).json({ message: "Comment added", comment });
+  } catch (err) {
+    console.error("Error creating comment:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
