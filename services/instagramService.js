@@ -8,7 +8,8 @@
 
 // const generateImageFromConfession = async (confession) => {
 //   const response = await axios.post(
-//     "http://localhost:3000/api/generate-image", // update port if needed
+//     "http://localhost:3000/api/generate-image", //
+//  port if needed
 //     {
 //       content: confession.content,
 //       college: confession.college,
@@ -107,7 +108,7 @@ import axios from "axios";
  */
 export const generateImageFromConfession = async (confession) => {
   const response = await axios.post(
-    "http://localhost:3001/api/generate-image",
+    "https://campus-confessions-backend.onrender.com/api/generate-image",
     {
       content: confession.content,
       college: confession.college,
