@@ -1025,7 +1025,12 @@ router.post("/:id/react", async (req, res) => {
       updatedConfession.skull +
       updatedConfession.cry;
 
+    console.log(
+      `Total reactions: ${totalReactions}, calling checkAndPostToInstagram...`
+    );
+
     if (totalReactions >= 50) {
+      console.log(`Total reactions >= 50, calling checkAndPostToInstagram...`);
       await checkAndPostToInstagram(updatedConfession);
     }
 

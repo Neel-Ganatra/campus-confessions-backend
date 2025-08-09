@@ -135,6 +135,9 @@ export const checkAndPostToInstagram = async (confession) => {
   // }
   const totalReactions =
     confession.fire + confession.heart + confession.skull + confession.cry;
+  console.log(
+    `checkAndPostToInstagram called with totalReactions = ${totalReactions}`
+  );
 
   if (totalReactions < 50) {
     console.log(
@@ -156,7 +159,9 @@ export const checkAndPostToInstagram = async (confession) => {
 export const postToInstagramWebhook = async (confession) => {
   try {
     const webhookUrl = process.env.INSTAGRAM_WEBHOOK_URL;
+    console.log(`Posting to webhook URL: ${webhookUrl}`);
     if (!webhookUrl) throw new Error("Webhook URL not set in .env");
+    console.log(`Generated image URL: ${imageUrl}`);
 
     const imageUrl = await generateImageFromConfession(confession);
 
