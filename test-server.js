@@ -115,6 +115,7 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
 import dotenv from "dotenv";
+import cors from "cors";
 
 dotenv.config();
 
@@ -123,6 +124,7 @@ const prisma = new PrismaClient();
 const PORT = 3001;
 
 app.use(express.json());
+app.use(cors());
 
 // Test endpoint
 app.post("/api/confessions", async (req, res) => {
