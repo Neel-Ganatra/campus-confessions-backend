@@ -165,7 +165,10 @@ const io = new Server(server, {
   cors: {
     origin:
       process.env.NODE_ENV === "production"
-        ? ["https://campus-confessions.vercel.app"] // change here
+        ? [
+            "https://campus-confessions.vercel.app",
+            "https://campusconfession.vercel.app",
+          ] // change here
         : [
             "http://localhost:3000",
             "http://localhost:5173",
@@ -356,6 +359,7 @@ function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
     console.error("❌ wrapText received invalid text:", text);
     return; // Exit early if text is invalid
   }
+
   const words = text.split(" ");
   let line = "";
   for (let i = 0; i < words.length; i++) {
