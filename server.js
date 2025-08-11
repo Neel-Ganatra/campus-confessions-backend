@@ -188,7 +188,10 @@ app.use(
   cors({
     origin:
       process.env.NODE_ENV === "production"
-        ? ["https://campus-confessions.vercel.app"]
+        ? [
+            "https://campus-confessions.vercel.app",
+            "https://campusconfession.vercel.app",
+          ]
         : ["http://localhost:3000", "http://localhost:5173"],
     credentials: true,
   })
