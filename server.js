@@ -160,6 +160,8 @@ import { handleSocketConnection } from "./socket/socketHandler.js";
 import { checkAndPostToInstagram } from "./services/instagramService.js";
 
 const app = express();
+app.set("trust proxy", 1);
+
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
@@ -400,6 +402,10 @@ app.use((err, req, res, next) => {
     error: errorMessage,
     timestamp: new Date().toISOString(),
   });
+});
+
+app.get("/", (req, res) => {
+  res.send("Backend is running ✅");
 });
 
 // 404 Handler
